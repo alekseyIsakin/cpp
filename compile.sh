@@ -11,11 +11,13 @@ OPTS=$(getopt -a -n cmake_script --options $SHORT -- "$@")
 eval set -- "$OPTS"
 
 help(){
-    echo "usage: compile  [-c | --clear]
-                [-B | --congigure-cmake]
-                [-b | --only-build]
+    echo "usage: compile  [-c | --clear] [0 | 1 | 2]
+                [-B | --congigure-cmake] [0 | 1 | 2]
+                [-b | --only-build] [0 | 1 | 2]
                 [-h | --help]
-                            "
+1 - for app1
+2 - for app2
+0 - for both"
     exit 2
 }
 
@@ -37,7 +39,7 @@ configure_cmake(){
 }
 
 compile(){
-        if [[ $1 -eq 1 ]] || [[ $1 -eq 0 ]] 
+    if [[ $1 -eq 1 ]] || [[ $1 -eq 0 ]] 
     then
         cd $TOP_DIRECTION/app1/app1_build
         cmake --build .
@@ -74,7 +76,7 @@ do
             shift 2
             ;;
         -b | --only-build)
-            compile
+            compile $2
             cmake --build .
             shift 2
             ;;
