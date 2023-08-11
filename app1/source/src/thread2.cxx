@@ -1,4 +1,5 @@
 #include <thread.hpp>
+#include <string>
 
 #ifndef THREAD2
 #define THREAD2
@@ -14,9 +15,17 @@ void thread2::operator()(Buffer *new_b)
         b->cv.wait(ul, [=]()
                    { return b->get_status() == Buffer::Status::in_process; });
 
-        auto s = b->read_from_buffer();
-        std::cout << "received string: " << s << '\n';
+        auto buffer = b->read_from_buffer();
+        std::cout << "received string: " << buffer << '\n';
 
+        int sum = 0;
+        for (int i = 0; i < buffer.length(); i++)
+        {
+            if (std::isdigit(buffer[i]))
+            {
+                sum += buffer[i] - ASCII_ZERO;
+            }
+        }
         b->set_status(Buffer::Status::cleared);
         ul.unlock();
     }

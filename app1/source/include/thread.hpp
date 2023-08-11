@@ -5,6 +5,7 @@
 #include <condition_variable>
 
 #define MAX_BUFFER_LEN 64
+#define ASCII_ZERO 48
 
 class Buffer
 {
