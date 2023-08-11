@@ -4,7 +4,7 @@
 #ifndef THREAD2
 #define THREAD2
 
-void thread2::operator()(Buffer *new_b)
+void Thread2::operator()(Buffer *new_b)
 {
     b = new_b;
     auto m = b->get_mutex();

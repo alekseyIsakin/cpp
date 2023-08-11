@@ -5,7 +5,7 @@
 #ifndef THREAD1
 #define THREAD1
 
-void thread1::operator()(Buffer *new_b)
+void Thread1::operator()(Buffer *new_b)
 {
     b = new_b;
 
@@ -29,7 +29,7 @@ void thread1::operator()(Buffer *new_b)
     }
 }
 
-void thread1::configure_string(std::string *buffer)
+void Thread1::configure_string(std::string *buffer)
 {
     std::sort(buffer->begin(), buffer->end(), std::greater<int>());
     char even[] = {'K', 'B'};
@@ -42,7 +42,7 @@ void thread1::configure_string(std::string *buffer)
     }
 }
 
-bool thread1::is_all_digit(std::string s)
+bool Thread1::is_all_digit(std::string s)
 {
     for (int i = 0; i < s.length(); i++)
     {
