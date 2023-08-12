@@ -36,7 +36,9 @@ private:
     std::mutex _lock;
 };
 
-class thread2
+
+
+class Thread2
 {
 public:
     void operator()(Buffer *);
@@ -45,7 +47,9 @@ private:
     Buffer *b;
 };
 
-class thread1
+
+
+class Thread1
 {
 public:
     void operator()(Buffer *);
