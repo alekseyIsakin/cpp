@@ -3,10 +3,14 @@
 #include <thread>
 #include <chrono>
 #include <condition_variable>
+#include <socket.hpp>
+
 
 #define MAX_BUFFER_LEN 64
 #define ASCII_ZERO 48
 
+#ifndef THREADS
+#define THREADS
 class Buffer
 {
 public:
@@ -17,7 +21,7 @@ public:
     };
     Buffer();
 
-    std::mutex *get_mutex() { return &_lock; }
+    std::mutex* get_mutex() { return &_lock; }
     Status get_status() { return _status; }
     void set_status(Status s) { _status = s; }
 
@@ -25,10 +29,7 @@ public:
     std::string read_from_buffer();
 
     std::condition_variable cv;
-    void show_buffer()
-    {
-        std::cout << _buffer << '\n';
-    }
+    void show_buffer() { std::cout << _buffer << '\n'; }
 
 private:
     std::string _buffer;
@@ -41,10 +42,12 @@ private:
 class Thread2
 {
 public:
-    void operator()(Buffer *);
+    Thread2(Buffer*, AppCommunication*);
+    void operator()();
 
 private:
-    Buffer *b;
+    Buffer* b;
+    AppCommunication* a;
 };
 
 
@@ -52,9 +55,12 @@ private:
 class Thread1
 {
 public:
-    void operator()(Buffer *);
+    Thread1(Buffer *);
+    void operator()();
     bool is_all_digit(std::string);
     void configure_string(std::string*);
 private:
     Buffer *b;
 };
+
+#endif

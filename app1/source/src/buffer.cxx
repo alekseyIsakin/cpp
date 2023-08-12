@@ -1,8 +1,5 @@
 #include <thread.hpp>
 
-#ifndef BUFFER
-#define BUFFER
-
 Buffer::Buffer()
 {
     _status = Status::cleared;
@@ -23,5 +20,3 @@ std::string Buffer::read_from_buffer()
     _buffer.clear();
     return s;
 }
-
-#endif

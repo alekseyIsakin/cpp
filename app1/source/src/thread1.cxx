@@ -1,14 +1,13 @@
 #include <thread.hpp>
 #include <cctype>
 #include <algorithm>
-
-#ifndef THREAD1
-#define THREAD1
-
-void Thread1::operator()(Buffer *new_b)
+Thread1::Thread1(Buffer *new_b)
 {
     b = new_b;
+}
 
+void Thread1::operator()()
+{
     auto m = b->get_mutex();
 
     while (true)
@@ -51,5 +50,3 @@ bool Thread1::is_all_digit(std::string s)
     }
     return true;
 }
-
-#endif

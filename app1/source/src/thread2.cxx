@@ -1,12 +1,15 @@
 #include <thread.hpp>
+#include <socket.hpp>
 #include <string>
 
-#ifndef THREAD2
-#define THREAD2
-
-void Thread2::operator()(Buffer *new_b)
+Thread2::Thread2(Buffer *new_b, AppCommunication *new_a)
 {
     b = new_b;
+    a = new_a;
+}
+
+void Thread2::operator()()
+{
     auto m = b->get_mutex();
 
     while (true)
@@ -28,7 +31,8 @@ void Thread2::operator()(Buffer *new_b)
         }
         b->set_status(Buffer::Status::cleared);
         ul.unlock();
+
+        uint8_t x[] = {1, 2, 3, 4};
+        a->send_msg(x, 4);
     }
 }
-
-#endif
