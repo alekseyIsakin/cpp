@@ -1,68 +1,55 @@
-#include <netinet/in.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <unistd.h>
+
+
 #include <socket.hpp>
 
 #ifndef SOCKET
 #define SOCKET
 
-void AppCommunication::start_server(int port)
+void AppCommunication::open_socket()
 {
-    int server_fd, new_socket, valread;
-    struct sockaddr_in address;
-    int opt = 1;
-    int addrlen = sizeof(address);
-    char buffer[1024] = {0};
-    char *hello = "Hello from server";
+    serverSocket = socket(AF_UNIX, SOCK_STREAM, 0);
 
-    // Creating socket file descriptor
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-    {
-        perror("socket failed");
-        exit(EXIT_FAILURE);
-    }
+    struct sockaddr_un serverAddress;
+    serverAddress.sun_family = AF_UNIX;
+    strcpy(serverAddress.sun_path, socketPath);
 
-    // Forcefully attaching socket to the port 8080
-    if (setsockopt(server_fd, SOL_SOCKET,
-                   SO_REUSEADDR | SO_REUSEPORT, &opt,
-                   sizeof(opt)))
-    {
-        perror("setsockopt");
-        exit(EXIT_FAILURE);
-    }
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(PORT);
+    // Unlink the socket path if it already exists (clean-up)
+    unlink(socketPath);
 
-    // Forcefully attaching socket to the port 8080
-    if (bind(server_fd, (struct sockaddr *)&address,
-             sizeof(address)) < 0)
-    {
-        perror("bind failed");
-        exit(EXIT_FAILURE);
-    }
-    if (listen(server_fd, 3) < 0)
-    {
-        perror("listen");
-        exit(EXIT_FAILURE);
-    }
-    if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen)) < 0)
-    {
-        perror("accept");
-        exit(EXIT_FAILURE);
-    }
-    valread = read(new_socket, buffer, 1024);
-    printf("%s\n", buffer);
-    send(new_socket, hello, strlen(hello), 0);
-    printf("Hello message sent\n");
+    bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress));
+    listen(serverSocket, 1);
 
-    // closing the connected socket
-    close(new_socket);
-    // closing the listening socket
-    shutdown(server_fd, SHUT_RDWR);
+    clientAddressSize = sizeof(clientAddress);
+    clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize);
+    std::cout << "obtain client socket" << '\n';
+}
+
+void AppCommunication::send_msg(const uint8_t *buff, size_t len)
+{
+    char buffer[1024];
+    int bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
+    std::cout << clientSocket << ' ' << rand()%10 << ' ' << bytesRead << '\n';
+
+    if (bytesRead > 0){
+        int res = send(clientSocket, buff, len, 0);
+    }
+    else
+    {
+        close_socket();
+        open_socket();
+    }
+}
+
+void AppCommunication::close_socket()
+{
+    close(clientSocket);
+    close(serverSocket);
+    unlink(socketPath);
+}
+
+AppCommunication::~AppCommunication()
+{
+    close_socket();
 }
 
 #endif
