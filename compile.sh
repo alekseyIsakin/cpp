@@ -4,6 +4,10 @@ path=`readlink -e "${BASH_SOURCE:-$0}"`
 TOP_DIRECTION=`dirname $path`
 cd "$TOP_DIRECTION"
 
+PATH_APP1=app1/
+PATH_APP2=app1/
+BUILD_TYPE=debug #[ debug | release ]
+
 SHORT=c:,b:,B:,h
 LONG=--clear:,--congigure-cmake:,--only-build:,--help
 OPTS=$(getopt -a -n cmake_script --options $SHORT -- "$@")
@@ -25,28 +29,28 @@ configure_cmake(){
     if [[ $1 -eq 1 ]] || [[ $1 -eq 0 ]] 
     then
         cd "$TOP_DIRECTION"
-        mkdir -p app1/app1_build
-        cd app1/app1_build
-        cmake ../source
+        mkdir -p app1/app1_build_$BUILD_TYPE
+        cd app1/app1_build_$BUILD_TYPE
+        cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ../source
     fi
     if [[ $1 -eq 2 ]] || [[ $1 -eq 0 ]] 
     then
         cd "$TOP_DIRECTION"
-        mkdir -p app2/app2_build
-        cd app2/app2_build
-        cmake ../source
+        mkdir -p app2/app2_build_$BUILD_TYPE
+        cd app2/app2_build_$BUILD_TYPE
+        cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ../source
     fi
 }
 
 compile(){
     if [[ $1 -eq 1 ]] || [[ $1 -eq 0 ]] 
     then
-        cd $TOP_DIRECTION/app1/app1_build
+        cd $TOP_DIRECTION/app1/app1_build_$BUILD_TYPE
         cmake --build .
     fi
     if [[ $1 -eq 2 ]] || [[ $1 -eq 0 ]] 
     then
-        cd $TOP_DIRECTION/app2/app2_build
+        cd $TOP_DIRECTION/app2/app2_build_$BUILD_TYPE
         cmake --build .
     fi
 }
@@ -55,12 +59,12 @@ clear(){
     if [[ $1 -eq 1 ]] || [[ $1 -eq 0 ]] 
     then
         cd "$TOP_DIRECTION"
-        rm app1/app1_build -fr
+        rm app1/app1_build* -fr
     fi
     if [[ $1 -eq 2 ]] || [[ $1 -eq 0 ]] 
     then
         cd "$TOP_DIRECTION"
-        rm app2/app2_build -fr
+        rm app2/app2_build* -fr
     fi
 }
 
