@@ -4,16 +4,6 @@
 
 int main()
 {
-    int x = 11223344;
-
-    uint8_t buff[sizeof(int)];
-    std::cout << "pack " << sizeof(int) << '\n';
-
-    // for (size_t i = 0; i < sizeof(int); i++)
-    // {
-    //     buff[i] = (x >> (8 * i)) & 0xFF;
-    //     std::cout << int(buff[i]) << '\n';
-    // }
     AppCommunication a = AppCommunication();
     Buffer b = Buffer();
 

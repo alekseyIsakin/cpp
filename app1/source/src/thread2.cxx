@@ -32,7 +32,13 @@ void Thread2::operator()()
         b->set_status(Buffer::Status::cleared);
         ul.unlock();
 
-        uint8_t x[] = {1, 2, 3, 4};
-        a->send_msg(x, 4);
+        // Pack sum
+        uint8_t buff[sizeof(int)];
+        for (size_t i = 0; i < sizeof(int); i++)
+        {
+            buff[i] = (sum >> (8 * i)) & 0xFF;
+            std::cout << int(buff[i]) << '\n';
+        }
+        a->send_msg(buff, sizeof(int));
     }
 }
