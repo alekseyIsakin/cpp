@@ -19,9 +19,10 @@ void Thread2::operator()()
                    { return b->get_status() == Buffer::Status::in_process; });
 
         auto buffer = b->read_from_buffer();
-        std::cout << "received string: " << buffer << std::endl;
+        std::cout << "string: " << buffer << std::endl;
+        std::clog << "string: " << buffer << std::endl;
 
-        int sum = 0;
+        uint sum = 0;
         for (int i = 0; i < buffer.length(); i++)
         {
             if (std::isdigit(buffer[i]))
@@ -33,13 +34,14 @@ void Thread2::operator()()
         ul.unlock();
 
         // Pack sum
-        uint8_t buff[sizeof(int)];
-        for (size_t i = 0; i < sizeof(int); i++)
+        uint8_t buff[sizeof(uint)];
+        for (size_t i = 0; i < sizeof(uint); i++)
         {
             buff[i] = (sum >> (8 * i)) & 0xFF;
+            std::clog << buff[i] << " ";
         }
+        std::clog << std::endl;
 
         a->send_msg(buff, sizeof(int));
-
     }
 }

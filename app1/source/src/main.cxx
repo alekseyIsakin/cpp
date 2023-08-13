@@ -5,7 +5,7 @@
 
 int main()
 {
-    AppCommunicationServer*a = AppCommunicationServer::get_instance();
+    AppCommunicationServer *a = AppCommunicationServer::get_instance();
     Buffer b = Buffer();
 
     struct sigaction sa;

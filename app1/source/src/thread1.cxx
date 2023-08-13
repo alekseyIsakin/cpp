@@ -13,8 +13,8 @@ void Thread1::operator()()
     while (true)
     {
         std::string s = "";
-        std::cout << ">> ";
         std::cin >> s;
+        std::clog << "input: " << s << std::endl;
 
         if (s.length() <= MAX_BUFFER_LEN && is_all_digit(s))
         {
@@ -24,6 +24,9 @@ void Thread1::operator()()
             b->write_to_buffer(s);
             b->set_status(Buffer::Status::in_process);
             b->cv.notify_all();
+        }
+        else{
+            std::cout << "string is`nt correct" << std::endl;
         }
     }
 }
