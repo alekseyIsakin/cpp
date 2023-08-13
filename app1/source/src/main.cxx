@@ -1,11 +1,12 @@
 #include <iostream>
 #include <thread.hpp>
-#include <socket.hpp>
+#include <socket_server.hpp>
 
 int main()
 {
-    AppCommunication a = AppCommunication();
+    AppCommunicationServer a = AppCommunicationServer();
     Buffer b = Buffer();
+    a.open_socket();
 
     auto p1 = Thread1(&b);
     auto p2 = Thread2(&b, &a);
@@ -16,5 +17,6 @@ int main()
     t2.detach();
     t3.join();
 
+    a.close_socket();
     return 0;
 }

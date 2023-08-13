@@ -1,8 +1,8 @@
 #include <thread.hpp>
-#include <socket.hpp>
+#include <socket_server.hpp>
 #include <string>
 
-Thread2::Thread2(Buffer *new_b, AppCommunication *new_a)
+Thread2::Thread2(Buffer *new_b, AppCommunicationServer *new_a)
 {
     b = new_b;
     a = new_a;
@@ -19,7 +19,7 @@ void Thread2::operator()()
                    { return b->get_status() == Buffer::Status::in_process; });
 
         auto buffer = b->read_from_buffer();
-        std::cout << "received string: " << buffer << '\n';
+        std::cout << "received string: " << buffer << std::endl;
 
         int sum = 0;
         for (int i = 0; i < buffer.length(); i++)
@@ -37,8 +37,13 @@ void Thread2::operator()()
         for (size_t i = 0; i < sizeof(int); i++)
         {
             buff[i] = (sum >> (8 * i)) & 0xFF;
-            std::cout << int(buff[i]) << '\n';
         }
-        a->send_msg(buff, sizeof(int));
+
+        // int con_status = -1;
+
+
+        // if (con_status != -1)
+            a->send_msg(buff, sizeof(int));
+
     }
 }

@@ -3,7 +3,7 @@
 #include <thread>
 #include <chrono>
 #include <condition_variable>
-#include <socket.hpp>
+#include <socket_server.hpp>
 
 
 #define MAX_BUFFER_LEN 64
@@ -29,7 +29,7 @@ public:
     std::string read_from_buffer();
 
     std::condition_variable cv;
-    void show_buffer() { std::cout << _buffer << '\n'; }
+    void show_buffer() { std::cout << _buffer << std::endl; }
 
 private:
     std::string _buffer;
@@ -42,12 +42,12 @@ private:
 class Thread2
 {
 public:
-    Thread2(Buffer*, AppCommunication*);
+    Thread2(Buffer*, AppCommunicationServer*);
     void operator()();
 
 private:
     Buffer* b;
-    AppCommunication* a;
+    AppCommunicationServer* a;
 };
 
 
