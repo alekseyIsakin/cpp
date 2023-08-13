@@ -14,8 +14,6 @@ void AppCommunicationServer::open_socket()
 
     bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress));
     listen(serverSocket, 1);
-
-    clientAddressSize = sizeof(clientAddress);
 }
 
 int AppCommunicationServer::try_connect()
@@ -38,7 +36,7 @@ int AppCommunicationServer::try_connect()
         if (FD_ISSET(serverSocket, &readfds) || FD_ISSET(serverSocket, &writefds))
         {
             clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize);
-            std::cout << "obtain client socket" << std::endl;
+            std::cout << "accept new client" << std::endl;
             _connect_flag = Status::connected;
             return 0;
         }
@@ -51,17 +49,16 @@ int AppCommunicationServer::try_connect()
     {
         perror("Select error");
     }
-    _connect_flag = Status::connected;
+    _connect_flag = Status::disconnected;
     return -1;
 }
 
-void AppCommunicationServer::send_msg(const uint8_t *buff, size_t len)
+void AppCommunicationServer::send_msg(const uint8_t *buff_s, size_t len)
 {
-    char buffer[1024];
 
     if (get_status() == Status::disconnected)
     {
-        perror("connection");
+        std::cout << "try reconnect... " << std::flush;
         try_connect();
 
         if (get_status() == Status::disconnected)
@@ -70,7 +67,8 @@ void AppCommunicationServer::send_msg(const uint8_t *buff, size_t len)
         }
     }
 
-    if (int sended = send(clientSocket, buff, len, 0) < 0)
+    auto st = get_status();
+    if (auto sended = send(clientSocket, buff_s, len, 0) < 0)
     {
         perror("send status");
         _connect_flag = Status::disconnected;
@@ -84,7 +82,18 @@ void AppCommunicationServer::close_socket()
     unlink(socketPath);
 }
 
+AppCommunicationServer::AppCommunicationServer()
+{
+}
 AppCommunicationServer::~AppCommunicationServer()
 {
     close_socket();
 }
+
+void broken_pipe_handler(int signal)
+{
+    AppCommunicationServer::get_instance()
+        ->set_status(AppCommunicationServer::Status::disconnected);
+}
+
+AppCommunicationServer *AppCommunicationServer::instancePtr = NULL;

@@ -39,11 +39,7 @@ void Thread2::operator()()
             buff[i] = (sum >> (8 * i)) & 0xFF;
         }
 
-        // int con_status = -1;
-
-
-        // if (con_status != -1)
-            a->send_msg(buff, sizeof(int));
+        a->send_msg(buff, sizeof(int));
 
     }
 }
