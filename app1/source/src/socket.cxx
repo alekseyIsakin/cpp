@@ -1,6 +1,10 @@
 #include <socket_server.hpp>
 #include <sys/select.h>
 
+#define SUCCESS_CONNECT 1
+#define TIMEOUT -1
+#define OTHER 0
+
 void AppCommunicationServer::open_socket()
 {
     serverSocket = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -27,8 +31,8 @@ int AppCommunicationServer::try_connect()
     FD_SET(serverSocket, &writefds);
 
     timeval timeout;
-    timeout.tv_sec = 10;
-    timeout.tv_usec = 0;
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 5e4;
 
     int s = select(serverSocket + 1, &readfds, &writefds, nullptr, &timeout);
     if (s > 0)
@@ -36,38 +40,50 @@ int AppCommunicationServer::try_connect()
         if (FD_ISSET(serverSocket, &readfds) || FD_ISSET(serverSocket, &writefds))
         {
             clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize);
-            std::cout << "accept new client" << std::endl;
             _connect_flag = Status::connected;
-            return 0;
+            return SUCCESS_CONNECT;
         }
     }
     else if (s == 0)
     {
-        std::cout << "Timeout: No connection within 10 seconds." << std::endl;
+        return TIMEOUT;
     }
-    else
-    {
-        perror("Select error");
-    }
-    _connect_flag = Status::disconnected;
-    return -1;
+    return OTHER;
 }
 
 void AppCommunicationServer::send_msg(const uint8_t *buff_s, size_t len)
 {
+    auto reconnect = [this](std::string msg) -> int
+    {
+        // std::cout
+        std::clog
+            << "try connect... " << std::flush;
+
+        auto connect = try_connect();
+        if (connect != SUCCESS_CONNECT)
+        {
+            // std::cout
+            std::clog
+                << ((connect == TIMEOUT) ? "timeout" : "select error")
+                << std::endl;
+            return connect;
+        }
+        else
+        {
+            // std::cout
+            std::clog
+                << "success" << std::endl;
+        }
+    };
 
     if (get_status() == Status::disconnected)
     {
-        std::cout << "try reconnect... " << std::flush;
-        try_connect();
-
-        if (get_status() == Status::disconnected)
-        {
+        if (reconnect("try connect... ") != SUCCESS_CONNECT)
             return;
-        }
     }
 
     auto st = get_status();
+
     if (auto sended = send(clientSocket, buff_s, len, 0) < 0)
     {
         perror("send status");
@@ -82,9 +98,7 @@ void AppCommunicationServer::close_socket()
     unlink(socketPath);
 }
 
-AppCommunicationServer::AppCommunicationServer()
-{
-}
+AppCommunicationServer::AppCommunicationServer() {}
 AppCommunicationServer::~AppCommunicationServer()
 {
     close_socket();
