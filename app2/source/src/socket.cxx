@@ -33,19 +33,15 @@ void AppCommunicationClient::open_socket()
         std::cout << "[" << std::time(0) << "]" << valread << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
-        if (valread < 0)
-            continue;
-        uint8_t buffer_r[] = {1};
-        int x = send(serverSocket, buffer_r, sizeof(buffer_r), 0);
-        std::cout << "result: " << x << std::endl;
+
     }
 }
 
 void AppCommunicationClient::close_socket()
 {
     // close(clientSocket);
-    close(serverSocket);
-    unlink(socketPath);
+    // close(serverSocket);
+    // unlink(socketPath);
 }
 
 AppCommunicationClient::~AppCommunicationClient()
