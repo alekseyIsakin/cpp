@@ -3,7 +3,6 @@
 
 
 int main(){
-    std::cout << "Hello World" << std::endl;
     AppCommunicationClient a = AppCommunicationClient();
     a.open_socket();
 

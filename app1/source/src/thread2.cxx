@@ -19,8 +19,6 @@ void Thread2::operator()()
                    { return b->get_status() == Buffer::Status::in_process; });
 
         auto buffer = b->read_from_buffer();
-        std::cout << "string: " << buffer << std::endl;
-        std::clog << "string: " << buffer << std::endl;
 
         uint sum = 0;
         for (int i = 0; i < buffer.length(); i++)
@@ -30,15 +28,18 @@ void Thread2::operator()()
                 sum += buffer[i] - ASCII_ZERO;
             }
         }
+        std::cout << "string: " << buffer << std::endl;
+        std::clog << "string: " << buffer  << ", sum: " << sum << std::endl;
         b->set_status(Buffer::Status::cleared);
         ul.unlock();
 
         // Pack sum
-        uint8_t buff[sizeof(uint)];
+        uint8_t buff[sizeof(uint)] = {0};
+        
         for (size_t i = 0; i < sizeof(uint); i++)
         {
             buff[i] = (sum >> (8 * i)) & 0xFF;
-            std::clog << buff[i] << " ";
+            std::clog << (int)buff[i] << " ";
         }
         std::clog << std::endl;
 
