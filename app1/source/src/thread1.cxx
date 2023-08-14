@@ -15,7 +15,9 @@ void Thread1::operator()()
         std::string s = "";
         std::cin >> s;
         std::clog << "input: " << s << std::endl;
-
+        if (s == "q"){
+            exit(0);
+        }
         if (s.length() <= MAX_BUFFER_LEN && is_all_digit(s))
         {
             //
