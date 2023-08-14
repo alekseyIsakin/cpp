@@ -46,8 +46,10 @@ int AppCommunicationServer::try_connect()
     }
     else if (s == 0)
     {
+        _connect_flag = Status::disconnected;
         return TIMEOUT;
     }
+    _connect_flag = Status::disconnected;
     return OTHER;
 }
 
@@ -60,20 +62,20 @@ void AppCommunicationServer::send_msg(const uint8_t *buff_s, size_t len)
             << "try connect... " << std::flush;
 
         auto connect = try_connect();
-        if (connect != SUCCESS_CONNECT)
-        {
-            // std::cout
-            std::clog
-                << ((connect == TIMEOUT) ? "timeout" : "select error")
-                << std::endl;
-            return connect;
-        }
-        else
+        if (connect == SUCCESS_CONNECT)
         {
             // std::cout
             std::clog
                 << "success" << std::endl;
         }
+        else
+        {
+            // std::cout
+            std::clog
+                << ((connect == TIMEOUT) ? "timeout" : "select error")
+                << std::endl;
+        }
+        return connect;
     };
 
     if (get_status() == Status::disconnected)
@@ -88,6 +90,14 @@ void AppCommunicationServer::send_msg(const uint8_t *buff_s, size_t len)
     {
         perror("send status");
         _connect_flag = Status::disconnected;
+
+        // try to reconnect
+        send_msg(buff_s, len);
+    }
+    else
+    {
+        std::clog
+            << "data was sent" << std::endl;
     }
 }
 
