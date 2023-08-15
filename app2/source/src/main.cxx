@@ -2,8 +2,11 @@
 #include <socket.hpp>
 
 
-int main(){
-    AppCommunicationClient a = AppCommunicationClient();
+
+int main()
+{
+    std::clog << "start" << std::endl;
+    Client a = Client();
     a.open_socket();
 
     return 0;

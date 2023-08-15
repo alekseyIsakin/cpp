@@ -1,5 +1,7 @@
 #include <thread.hpp>
 
+Buffer *Buffer::instancePtr = NULL;
+
 Buffer::Buffer()
 {
     _status = Status::cleared;

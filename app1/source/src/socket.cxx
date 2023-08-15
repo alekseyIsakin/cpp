@@ -5,7 +5,9 @@
 #define TIMEOUT -1
 #define OTHER 0
 
-void AppCommunicationServer::open_socket()
+Server *Server::instancePtr = NULL;
+
+void Server::open_socket()
 {
     serverSocket = socket(AF_UNIX, SOCK_STREAM, 0);
 
@@ -20,7 +22,7 @@ void AppCommunicationServer::open_socket()
     listen(serverSocket, 1);
 }
 
-int AppCommunicationServer::try_connect()
+int Server::try_connect()
 {
 
     fd_set readfds;
@@ -53,17 +55,18 @@ int AppCommunicationServer::try_connect()
     return OTHER;
 }
 
-void AppCommunicationServer::send_msg(const uint8_t *buff_s, size_t len)
+void Server::send_msg(const uint8_t *buff_s, size_t len)
 {
     auto reconnect = [this](std::string msg) -> int
     {
+        auto connect = try_connect();
+
         // std::cout
         std::clog
             << "try connect... " << std::flush;
-
-        auto connect = try_connect();
         if (connect == SUCCESS_CONNECT)
         {
+
             // std::cout
             std::clog
                 << "success" << std::endl;
@@ -91,33 +94,33 @@ void AppCommunicationServer::send_msg(const uint8_t *buff_s, size_t len)
         perror("send status");
         _connect_flag = Status::disconnected;
 
-        // try to reconnect
+        // connection lost, try to reconnect
         send_msg(buff_s, len);
     }
     else
     {
+#ifdef DEBUG
         std::clog
             << "data was sent" << std::endl;
+#endif
     }
 }
 
-void AppCommunicationServer::close_socket()
+void Server::close_socket()
 {
     close(clientSocket);
     close(serverSocket);
     unlink(socketPath);
 }
 
-AppCommunicationServer::AppCommunicationServer() {}
-AppCommunicationServer::~AppCommunicationServer()
+Server::Server() {}
+Server::~Server()
 {
     close_socket();
 }
 
 void broken_pipe_handler(int signal)
 {
-    AppCommunicationServer::get_instance()
-        ->set_status(AppCommunicationServer::Status::disconnected);
+    Server::get_instance()
+        ->set_status(Server::Status::disconnected);
 }
-
-AppCommunicationServer *AppCommunicationServer::instancePtr = NULL;

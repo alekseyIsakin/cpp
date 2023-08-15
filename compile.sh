@@ -19,9 +19,9 @@ help(){
                 [-B | --congigure-cmake] [0 | 1 | 2]
                 [-b | --only-build] [0 | 1 | 2]
                 [-h | --help]
-1 - for app1
-2 - for app2
-0 - for both"
+1 - for programm 1
+2 - for programm 2
+0 - for both programms"
     exit 2
 }
 

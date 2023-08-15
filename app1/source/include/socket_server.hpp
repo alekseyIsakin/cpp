@@ -3,6 +3,7 @@
 #include <sys/un.h>
 #include <unistd.h>
 #include <cstring>
+#include <mode.hpp>
 
 #define PORT 8080
 
@@ -11,18 +12,18 @@
 
 void broken_pipe_handler(int signal);
 
-class AppCommunicationServer
+class Server
 {
 public:
-    static AppCommunicationServer *get_instance()
+    static Server *get_instance()
     {
         if (instancePtr == nullptr)
         {
-            instancePtr = new AppCommunicationServer();
+            instancePtr = new Server();
         }
         return instancePtr;
     };
-    AppCommunicationServer(const AppCommunicationServer &obj) = delete;
+    Server(const Server &obj) = delete;
 
 public:
     enum class Status
@@ -42,15 +43,15 @@ public:
     void set_status(Status new_status) { _connect_flag = new_status; }
 
 private:
-    ~AppCommunicationServer();
-    AppCommunicationServer();
+    ~Server();
+    Server();
     int clientSocket = -1;
     int serverSocket = -1;
     struct sockaddr_un clientAddress;
     socklen_t clientAddressSize;
 
     Status _connect_flag = Status::disconnected;
-    static AppCommunicationServer *instancePtr;
+    static Server *instancePtr;
 };
 
 

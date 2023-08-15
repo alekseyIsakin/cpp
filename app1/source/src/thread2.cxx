@@ -2,10 +2,10 @@
 #include <socket_server.hpp>
 #include <string>
 
-Thread2::Thread2(Buffer *new_b, AppCommunicationServer *new_a)
+Thread2::Thread2()
 {
-    b = new_b;
-    a = new_a;
+    a = Server::get_instance();
+    b = Buffer::get_instance();
 }
 
 void Thread2::operator()()
@@ -29,19 +29,25 @@ void Thread2::operator()()
             }
         }
         std::cout << "string: " << buffer << std::endl;
-        std::clog << "string: " << buffer  << ", sum: " << sum << std::endl;
+#ifdef DEBUG
+        std::clog << "string: " << buffer << ", sum: " << sum << std::endl;
+#endif
         b->set_status(Buffer::Status::cleared);
         ul.unlock();
 
         // Pack sum
         uint8_t buff[sizeof(uint)] = {0};
-        
+
         for (size_t i = 0; i < sizeof(uint); i++)
         {
             buff[i] = (sum >> (8 * i)) & 0xFF;
-            std::clog << (int)buff[i] << " ";
         }
+
+#ifdef DEBUG
+        for (size_t i = 0; i < sizeof(uint); i++)
+            std::clog << (int)buff[i] << " ";
         std::clog << std::endl;
+#endif
 
         a->send_msg(buff, sizeof(int));
     }
